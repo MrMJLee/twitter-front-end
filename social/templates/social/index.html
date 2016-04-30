@@ -1,0 +1,260 @@
+<html lang='en'>
+<head>
+  <meta charset='utf-8' />
+
+  <title>Mood-India</title>
+  {% load staticfiles %}
+  <link id="bootstrap-style" href={% static "social/css/bootstrap.css" %} rel="stylesheet" type="text/css" />
+  <link id="base-style" href={% static "social/style.css"%} rel="stylesheet" type="text/css" />
+  <script src={% static "social/jquery-1.7.2.min.js"%} type="text/javascript">
+</script>
+  <script src={% static "social/jquery-ui-1.8.21.custom.min.js"%} type="text/javascript">
+</script>
+  <script src={% static "social/jquery.flot.js"%} type="text/javascript">
+</script>
+  <script src={% static "social/jquery.flot.pie.js"%} type="text/javascript">
+</script>
+  <script type="text/javascript">
+                var showplots = function(){
+                        var data=[
+                        {label: "Positive", data: {{positivesentiment}}},
+                        {label: "Negative", data: {{negativesentiment}}},
+                        {label: "Neutral", data: {{neutralsentiment}}}
+                        ];
+                        if($("#mipiechart").length)
+                        {
+                                $.plot($("#mipiechart"),data,
+                                {
+                                        series:{
+                                                pie:{
+                                                show:true
+                                                }
+                                        },
+                                        grid:{
+                                                hoverable:true,
+                                                clickable:true
+                                        },
+                                        legend:{
+                                                show:false
+                                        },
+                                        colors:["#78CD51","#FA5833","#FABB3D","#2FABE9"]
+                                });
+                        function pieHover(event,pos,obj)
+                        {
+                        if(!obj)
+                                return;
+                        percent = parseFloat(obj.series.percent).toFixed(2);
+                        $("#hover").html('<span style="font-weight:bold; color:'+obj.series.color+'">'+obj.series.label+'('+percent+'%)<\/span>');
+                        }
+                         $("#mipiechart").bind('plothover',pieHover);
+                        }
+
+                        /*Pie chart end */
+                        /*Hourlychart start */
+                        if ($('#mihourlychart').length)
+                        {
+                                var totaldata = [
+                                {% for key, val in total.items %}
+                                [{{key}},{{val}}],
+                                {% endfor %}
+                                ];
+                                var positivedata = [
+                                {% for key, val in positive.items %}
+                                [{{key}},{{val}}],
+                                {% endfor %}
+                                ];
+                                var negativedata =[
+                                {% for key, val in negative.items %}
+                                [{{key}},{{val}}],
+                                {% endfor %}
+                                ];
+                                var neutraldata = [
+                                {%for key, val in neutral.items %}
+                                [{{key}},{{val}}],
+                                {% endfor %}
+                                ];
+
+                                var plot= $.plot($('#mihourlychart'),
+                                        [{data: totaldata,label:'Total Tweets'},
+                                        {data: positivedata,label:"Positive Tweets"},
+                                        {data: negativedata,label:"Negative Tweets"},
+                                        {data: neutraldata, label: "Neutral Tweets"}],{
+                                        series: {
+                                        lines:{show:true, lineWidth:2}, points:{show:true,lineWidth:2},shadowSize:0},
+                                        grid:{hoverable:true, clickable:true,tickColor:"#f9f9f9", borderWidth:0},
+                                        legend: { show:false},
+                                        colors: ['#2FABE9','#74DF00','#FF0000','#eae874'],
+                                        xaxis: {ticks:15,tickDecimals:0}, yaxis: {ticks:5, tickDecimals:0},
+                                        });
+                        }
+                        }
+  </script>
+  <style>
+  .positive-sentiment {
+	width: {{pospercent}}%;
+  }
+  .neutral-sentiment {
+	width: {{neupercent}}%;
+  }
+  .negative-sentiment {
+	width: {{negpercent}}%;
+}
+  .hourly-activity {
+      overflow-y: hidden;
+    white-space: nowrap;
+  }
+  </style>
+</head>
+
+<body onload="showplots()">
+<div class="container">
+
+	<div class="jumbotron">
+
+	<h1>Twitter Analytics</h1>
+	<div class="row">
+		<div class="col-md-12">	
+			<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4>Last 24 hours statistics</h4>
+		</div>
+		<table class="table">
+			<thead> 
+				<tr>
+					<th>Sentiment</th>
+					<th>Number of Tweets</th>
+					<th>Percentage of Tweets</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="success">
+					<th scope="row">
+						Positive
+					</th>
+					<td>
+						{{positivesentiment}}
+					</td>
+					<td>
+						{{pospercent}}%
+					</td>
+				</tr>
+				<tr class="active">
+					<th scope="row">
+						Neutral
+					</th>
+					<td>
+						{{neutralsentiment}}
+					</td>
+					<td>
+						{{neupercent}}%
+					</td>
+				</tr>
+				<tr class="danger">
+					<th scope="row">
+						Negative
+					</th>
+					<td>
+						{{negativesentiment}}
+					</td>
+					<td>
+						{{negpercent}}%
+					</td>
+				</tr>
+				<tr class="default">
+					<th scope="row">
+						Total Tweets
+					</th>
+					<td>
+						{{totaltweets}}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="panel-footer">
+			<p>
+				<div class="progress">
+					<div class="progress-bar progress-bar-success positive-sentiment">
+						{{pospercent}}%
+					</div>
+					<div class="progress-bar progress-bar-default neutral-sentiment">
+						{{neupercent}}%
+					</div>
+					<div class="progress-bar progress-bar-danger negative-sentiment">
+						{{negpercent}}%
+					</div>
+				</div>
+			</p>
+		</div>
+	</div>
+		</div>
+	</div>
+	<div class="row hourly-activity">
+		<div class="col-md-12">	
+			<h2><span class="glyphicon glyphicon-random"><i></i></span> Hourly Activity</h2>
+			<hr />
+			<div id="mihourlychart" class="span12" style="height:300px"></div>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-md-6">
+					<h2>
+						<span class="glyphicon glyphicon-user"></span>  Top Tweets
+					</h2>
+					<hr />
+					<ul class="list-group">
+
+					{% for key,val in toptweets.items %}
+						<li class="list-group-item">
+							
+								<h3 class="list-group-item-heading">
+									<a href="http://twitter.com/{{key}}" target="_blank">
+									{{key}}
+									</a>
+								</h3>
+							<p class="list-group-item-text">
+							{{val.2}}
+
+							</p>
+															<h3 class="text-right text-primary">
+										{{val.3}}&nbsp;retweets
+
+										{% if val.4 < 0 %}
+										<i class="glyphicon glyphicon-thumbs-down"></i>
+										{% else %}
+										{% if val.4 > 0 %} 
+										<i class="glyphicon glyphicon-thumbs-up"></i>
+										{% else %}
+										<i class="glyphicon glyphicon-hand-right"></i>
+										{% endif %}{% endif %}
+									</h3>
+						</li>
+						{% endfor %}
+					</ul>
+					
+				</div>
+
+		<div class="col-md-3">
+				  <h2><span class="glyphicon glyphicon-fire"></span> Overall Sentiment</h2>
+				  <hr />
+
+				  <div id="mipiechart" style="height:200px"></div>
+				</div>
+
+		<div class="col-md-3">
+			<h2><span class="glyphicon glyphicon-asterisk"></span> Top Hashtags</h2>
+			<hr />
+			
+			<div class="list-group">
+				{% for key,val in hashtags.items %} 
+				<div class="list-group-item">
+					#{{key}}
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</body>
+</html>
