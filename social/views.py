@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from collections import OrderedDict
 from datetime import date, timedelta
 from django.template import loader
-
+import math
 
 today = str(date.today())
 
@@ -19,9 +19,9 @@ def home(request):
         negativesentiment = postdic['negativesentiment']
         neutralsentiment = postdic['neutralsentiment']
 
-        pospercent = round(positivesentiment *100/totaltweets)
-        negpercent = round(negativesentiment *100/totaltweets)
-        neupercent = round(neutralsentiment *100/totaltweets)
+        pospercent = math.ceil(positivesentiment *100/totaltweets)
+        negpercent = math.ceil(negativesentiment *100/totaltweets)
+        neupercent = math.ceil(neutralsentiment *100/totaltweets)
 
         hashtags = postdic['hashtags']
         hashtags = OrderedDict(sorted(hashtags.items(), key=lambda x:x[1],reverse=True))
