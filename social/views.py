@@ -8,7 +8,7 @@ from django.template import loader
 
 today = str(date.today())
 
-client = MongoClient('52.39.64.203',27017)
+client = MongoClient('52.36.220.142',27017)
 db = client['MyApp']
 
 def home(request):
@@ -19,9 +19,9 @@ def home(request):
         negativesentiment = postdic['negativesentiment']
         neutralsentiment = postdic['neutralsentiment']
 
-        pospercent = positivesentiment *100/totaltweets
-        negpercent = negativesentiment *100/totaltweets
-        neupercent = neutralsentiment *100/totaltweets
+        pospercent = round(positivesentiment *100/totaltweets)
+        negpercent = round(negativesentiment *100/totaltweets)
+        neupercent = round(neutralsentiment *100/totaltweets)
 
         hashtags = postdic['hashtags']
         hashtags = OrderedDict(sorted(hashtags.items(), key=lambda x:x[1],reverse=True))
