@@ -19,9 +19,9 @@ def home(request):
         negativesentiment = postdic['negativesentiment']
         neutralsentiment = postdic['neutralsentiment']
 
-        pospercent = math.ceil(positivesentiment *100/totaltweets)
-        negpercent = math.ceil(negativesentiment *100/totaltweets)
-        neupercent = math.ceil(neutralsentiment *100/totaltweets)
+        pospercent = math.ceil(float(positivesentiment *100)/totaltweets)
+        negpercent = math.ceil(float(negativesentiment *100)/totaltweets)
+        neupercent = math.ceil(float(neutralsentiment *100)/totaltweets)
 
         hashtags = postdic['hashtags']
         hashtags = OrderedDict(sorted(hashtags.items(), key=lambda x:x[1],reverse=True))
