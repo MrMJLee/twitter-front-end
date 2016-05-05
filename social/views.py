@@ -8,7 +8,7 @@ import math
 
 today = str(date.today())
 
-client = MongoClient('52.36.220.142',27017)
+client = MongoClient('52.33.5.191',27017)
 db = client['MyApp']
 
 def home(request):
