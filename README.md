@@ -1,0 +1,1 @@
+This Social-App uses Django as a web framework and it provides the template to render the aggregated results.
